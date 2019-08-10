@@ -1,0 +1,82 @@
+{
+  "minimum-stability": "stable",
+  "require": {
+    "php": ">=7.1",
+    "yiisoft/yii2": "~2.0",
+    "daneden/animate.css": "3.7.2",
+    "twbs/bootstrap": "4.3.1",
+    "webprowww/bootstrap-helper": "1.0.1",
+    "fortawesome/font-awesome": "5.10.1",
+    "bower-asset/jquery": "3.4.1",
+    "vuejs/vue": "2.6.10",
+    "axios/axios": "0.19.0",
+    "phpoffice/phpspreadsheet": "^1.8",
+    "ext-libxml": "*",
+    "ext-simplexml": "*"
+  },
+  "require-dev": {
+    "yiisoft/yii2-debug": "~2.1",
+    "yiisoft/yii2-gii": "~2.1"
+  },
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://asset-packagist.org"
+    },
+    {
+      "type": "package",
+      "package": {
+        "name": "vuejs/vue",
+        "version": "2.6.10",
+        "dist": {
+          "url": "https://github.com/vuejs/vue/archive/v2.6.10.zip",
+          "type": "zip"
+        }
+      }
+    },
+    {
+      "type": "package",
+      "package": {
+        "name": "webprowww/bootstrap-helper",
+        "version": "1.0.1",
+        "dist": {
+          "url": "https://github.com/WebProWWW/bootstrap-helper/archive/1.0.1.zip",
+          "type": "zip"
+        }
+      }
+    },
+    {
+      "type": "package",
+      "package": {
+        "name": "fortawesome/font-awesome",
+        "version": "5.10.1",
+        "dist": {
+          "url": "https://github.com/FortAwesome/Font-Awesome/archive/5.10.1.zip",
+          "type": "zip"
+        }
+      }
+    },
+    {
+      "type": "package",
+      "package": {
+        "name": "daneden/animate.css",
+        "version": "3.7.2",
+        "dist": {
+          "url": "https://github.com/daneden/animate.css/archive/3.7.2.zip",
+          "type": "zip"
+        }
+      }
+    },
+    {
+      "type": "package",
+      "package": {
+        "name": "axios/axios",
+        "version": "0.19.0",
+        "dist": {
+          "url": "https://github.com/axios/axios/archive/v0.19.0.zip",
+          "type": "zip"
+        }
+      }
+    }
+  ]
+}
