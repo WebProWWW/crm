@@ -1,5 +1,9 @@
 {
   "minimum-stability": "stable",
+  "provide": {
+    "ext-libxml": "*",
+    "ext-simplexml": "*"
+  },
   "require": {
     "php": ">=7.1",
     "yiisoft/yii2": "~2.0",
