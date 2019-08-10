@@ -114,6 +114,7 @@ Vue.component 'app-btn-group',
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 Vue.component 'app-input',
+    # value="http://crm.loc/tmp/yandex.xml"
     template: '
         <div
             class="animated faster"
@@ -127,7 +128,6 @@ Vue.component 'app-input',
                     :class="{error: error}"
                     :name="input.name"
                     @focus="error = false"
-                    value="http://crm.loc/tmp/yandex.xml"
                 >
                 <a
                     href="#"
