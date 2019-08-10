@@ -27,6 +27,9 @@ return [
         'request' => [
             'csrfParam'             => '_csrf-cms',
             'cookieValidationKey'   => '0yMC0WcaTEcxq3e3Q8-DZxBw5-bwaUEQ',
+            'parsers' => [
+                'application/json' => yii\web\JsonParser::class,
+            ],
         ],
         'session' => [
             'name' => '_sess-cms',
@@ -42,6 +45,12 @@ return [
         ],
         'cache' => [
             'class' => yii\caching\FileCache::class
+        ],
+        'user' => [
+            'identityClass'    => components\user\Identity::class,
+            'enableAutoLogin'  => true,
+            'loginUrl'         => ['/site/default/login'],
+            'identityCookie'   => ['name'=>'_identity-cms','httpOnly'=>true],
         ],
     ],
 ];
