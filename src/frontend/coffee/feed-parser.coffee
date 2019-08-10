@@ -125,9 +125,9 @@ Vue.component 'app-input',
                 <input
                     type="text"
                     class="input"
-                    :class="{error: error}"
+                    :class="{error: input.error}"
                     :name="input.name"
-                    @focus="error = false"
+                    @focus="input.error = false"
                 >
                 <a
                     href="#"
@@ -137,7 +137,7 @@ Vue.component 'app-input',
                     <i class="fas fa-times"></i>
                 </a>
             </div><!-- /.input-group -->
-            <span v-if="error" class="input-error">{{ error }}</span>
+            <span v-if="input.error" class="input-error">{{ input.error }}</span>
         </div>
     '
 
@@ -148,11 +148,12 @@ Vue.component 'app-input',
 
     data: ->
         error: off
+        errorMsg: ''
         animClass: 'fadeInDown'
 
     methods:
         remove: (e) ->
-            this.$emit 'remove', this
+            @$emit 'remove', @
             on
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -176,7 +177,7 @@ Vue.component 'app-input-list',
 
     methods:
         removeInput: (input, i) ->
-            this.$emit 'remove', input, i
+            @$emit 'remove', input, i
             on
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -212,33 +213,34 @@ Vue.component 'app-form',
 
     methods:
         addInput: (input) ->
-            this.inputId = 0 if this.inputs.length is 0
-            id = ++this.inputId
-            this.inputs.push
+            this.inputId = 0 if @inputs.length is 0
+            id = ++@inputId
+            @inputs.push
                 label: input.label
                 name: "#{input.name}[#{id}]"
                 id: id
-            this.toggleSubmit on if this.inputs.length is 1
+                error: ''
+            @toggleSubmit on if @inputs.length is 1
             on
         removeInput: (input, i) ->
-            this.toggleSubmit off if this.inputs.length is 1
+            @toggleSubmit off if @inputs.length is 1
             input.animClass = 'fadeOutUp'
-            this.$delay 500, () => this.inputs.splice i, 1
+            @$delay 500, () => @inputs.splice i, 1
             on
         toggleSubmit: (show) ->
             if show
-                this.submitAnimClass = 'fadeInUp'
-                this.showSubmit = on
+                @submitAnimClass = 'fadeInUp'
+                @showSubmit = on
             else
-                this.submitAnimClass = 'fadeOutDown'
-                this.$delay 500, () => this.showSubmit = off
+                @submitAnimClass = 'fadeOutDown'
+                @$delay 500, () => @showSubmit = off
             on
         send: (e) ->
             formData = new FormData e.target
-            this.$refs.loader.post 'parse.json', formData, (data) =>
+            @$refs.loader.post 'parse.json', formData, (data) =>
                 if data?.errors?
-                    console.log data.errors
-                    # this.addErrors Number(id), msgArr[0] for id, msgArr of data.errors
+                    for id, msgArr of data.errors
+                        input.error = msgArr[0] for input in @inputs when Number(id) is input.id
                 else if data?.xlsxFiles?
                     @$emit 'complete', data.xlsxFiles
             on
