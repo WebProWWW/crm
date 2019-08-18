@@ -460,15 +460,15 @@ App =
             {
                 name: 'app-xml-xlsx'
                 label: 'XML <i class="fas fa-chevron-right"></i> XLSX'
-                active: off
+                active: on
             }
             {
                 name: 'app-xlsx-xml'
                 label: 'XLSX <i class="fas fa-chevron-right"></i> XML'
-                active: on
+                active: off
             }
         ]
-        currentComponent: 'app-xlsx-xml'
+        currentComponent: 'app-xml-xlsx'
 
     methods:
         showComponent: (name) ->
