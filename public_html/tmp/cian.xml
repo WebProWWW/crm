@@ -1,29 +1,61 @@
 <feed>
   <feed_version>2</feed_version>
-    <object>
+
+  <object>
     <Category>officeRent</Category>
     <ExternalId>81136pd</ExternalId>
     <Description>Лот: 136pd. Офисный центр расположен на северо-западе Москвы, в непосредственной близости от ММДЦ «Москва-Сити», с удобным доступом к Третьему Транспортному Кольцу и Звенигородскому шоссе, недалеко от станций метро «Полежаевская», «Беговая» и «Улица 1905 года». </Description>
     <Address>Москва, Магистральный 1-й проезд, 11с1</Address>
     <Coordinates>
-	<Lat>55.7651732</Lat>
-	<Lng>37.526374</Lng>
-</Coordinates>
+      <Lat>55.7651732</Lat>
+      <Lng>37.526374</Lng>
+    </Coordinates>
     <Phones>
       <PhoneSchema>
         <CountryCode>+7</CountryCode>
         <Number>4951519045</Number>
       </PhoneSchema>
     </Phones>
-    <Underground><TransportType>walk</TransportType><Time>10</Time><Id>97</Id></Underground>
+    <Underground>
+      <TransportType>walk</TransportType>
+      <Time>10</Time>
+      <Id>97</Id>
+    </Underground>
     <TotalArea>1836</TotalArea>
     <MinArea>456</MinArea>
     <MaxArea>1836</MaxArea>
     <FloorNumber>3</FloorNumber>
     <ConditionType>office</ConditionType>
     <IsOccupied>false</IsOccupied>
-    <Photos><PhotoSchema><FullUrl>https://extpic2.kf.expert/OFFICE/136/wm/cf3619a274a0344099f8dd7e7364d67e.jpg</FullUrl><IsDefault>False</IsDefault></PhotoSchema><PhotoSchema><FullUrl>https://extpic2.kf.expert/OFFICE/136/wm/2fea2fed86acb45a8a63ec896252834e.jpg</FullUrl><IsDefault>True</IsDefault></PhotoSchema><PhotoSchema><FullUrl>https://extpic2.kf.expert/OFFICE/136/wm/b0fa2b03fc6435187313803bd92a0cad.jpg</FullUrl><IsDefault>False</IsDefault></PhotoSchema><PhotoSchema><FullUrl>https://extpic2.kf.expert/OFFICE/136/wm/ae04a79b6b52da7f256e8a8b391c3015.jpg</FullUrl><IsDefault>False</IsDefault></PhotoSchema><PhotoSchema><FullUrl>https://extpic2.kf.expert/OFFICE/136/wm/d2f5d93c7de58c9d3a6cce416b37fb19.jpg</FullUrl><IsDefault>False</IsDefault></PhotoSchema><PhotoSchema><FullUrl>https://extpic2.kf.expert/OFFICE/136/wm/1ff46f177684c006cbfe48ce4e280744.jpg</FullUrl><IsDefault>False</IsDefault></PhotoSchema></Photos>
-    <BusinessShoppingCenter><Id>5677</Id></BusinessShoppingCenter>
+    <Photos>
+      <PhotoSchema>
+        <FullUrl>https://extpic2.kf.expert/OFFICE/136/wm/cf3619a274a0344099f8dd7e7364d67e.jpg</FullUrl>
+        <IsDefault>False</IsDefault>
+      </PhotoSchema>
+      <PhotoSchema>
+        <FullUrl>https://extpic2.kf.expert/OFFICE/136/wm/2fea2fed86acb45a8a63ec896252834e.jpg</FullUrl>
+        <IsDefault>True</IsDefault>
+      </PhotoSchema>
+      <PhotoSchema>
+        <FullUrl>https://extpic2.kf.expert/OFFICE/136/wm/b0fa2b03fc6435187313803bd92a0cad.jpg</FullUrl>
+        <IsDefault>False</IsDefault>
+      </PhotoSchema>
+      <PhotoSchema>
+        <FullUrl>https://extpic2.kf.expert/OFFICE/136/wm/ae04a79b6b52da7f256e8a8b391c3015.jpg</FullUrl>
+        <IsDefault>False</IsDefault>
+      </PhotoSchema>
+      <PhotoSchema>
+        <FullUrl>https://extpic2.kf.expert/OFFICE/136/wm/d2f5d93c7de58c9d3a6cce416b37fb19.jpg</FullUrl>
+        <IsDefault>False</IsDefault>
+      </PhotoSchema>
+      <PhotoSchema>
+        <FullUrl>https://extpic2.kf.expert/OFFICE/136/wm/1ff46f177684c006cbfe48ce4e280744.jpg</FullUrl>
+        <IsDefault>False</IsDefault>
+      </PhotoSchema>
+    </Photos>
+    <BusinessShoppingCenter>
+      <Id>5677</Id>
+    </BusinessShoppingCenter>
     <Building>
       <FloorsCount>5</FloorsCount>
       <BuildYear>2007</BuildYear>
@@ -32,9 +64,17 @@
       <ClassType>b</ClassType>
       <Infrastructure>
         <HasRestaurant>true</HasRestaurant>
-        </Infrastructure>
+      </Infrastructure>
     </Building>
-    <PublishTerms><Terms><PublishTermSchema><Services><ServicesEnum>paid</ServicesEnum></Services></PublishTermSchema></Terms></PublishTerms>
+    <PublishTerms>
+      <Terms>
+        <PublishTermSchema>
+          <Services>
+            <ServicesEnum>paid</ServicesEnum>
+          </Services>
+        </PublishTermSchema>
+      </Terms>
+    </PublishTerms>
     <BargainTerms>
       <Price>15250.0</Price>
       <PriceType>squareMeter</PriceType>
@@ -42,11 +82,14 @@
       <PaymentPeriod>annual</PaymentPeriod>
       <VatType>vatIncluded</VatType>
       <LeaseType>direct</LeaseType>
-      <IncludedOptions><IncludedOptionsEnum>operationalCosts</IncludedOptionsEnum></IncludedOptions>
+      <IncludedOptions>
+        <IncludedOptionsEnum>operationalCosts</IncludedOptionsEnum>
+      </IncludedOptions>
       <ClientFee>0</ClientFee>
       <AgentFee>0</AgentFee>
     </BargainTerms>
-    </object>
+  </object>
+
   <object>
     <Category>officeRent</Category>
     <ExternalId>81172pd</ExternalId>

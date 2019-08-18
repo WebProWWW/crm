@@ -11,6 +11,7 @@ use modules\fidParser\models\XmlParser;
 use Yii;
 use yii\rest\Controller;
 use yii\web\BadRequestHttpException;
+use yii\web\UploadedFile;
 
 class ApiController extends Controller
 {
@@ -24,23 +25,23 @@ class ApiController extends Controller
      * @return array
      * @throws BadRequestHttpException
      */
-    public function actionParse()
+    public function actionParseXml()
     {
         $model = new XmlParser();
         $req = Yii::$app->request;
         if ($req->isPost and $model->load($req->post(), '')) {
             $data = null;
-            if ($model->validate() && $model->parse()) {
+            if ($model->convertXmlToXlsx()) {
                 return [
                     'xlsxFiles' => $model->xlsxFiles,
-                    'processErrors' => $model->errors,
+                    'errors' => $model->errors,
                 ];
             }
             return [
                 'errors' => $model->errors,
             ];
         }
-        throw new BadRequestHttpException();
+        throw new BadRequestHttpException('Неверный запрос');
     }
 
     /**
@@ -52,12 +53,52 @@ class ApiController extends Controller
         $model = new XmlParser();
         $req = Yii::$app->request;
         if ($req->isPost and $model->load($req->post(), '')) {
-            if ($model->validate() && $model->removeXlsx()) {
+            if ($model->removeXlsx()) {
                 return ['status' => true];
             }
             return ['errors' => $model->errors];
         }
-        throw new BadRequestHttpException();
+        throw new BadRequestHttpException('Неверный запрос');
+    }
+
+    /**
+     * @return array
+     * @throws BadRequestHttpException
+     */
+    public function actionParseXlsx()
+    {
+        $model = new XmlParser();
+        $req = Yii::$app->request;
+        if ($req->isPost) {
+            $model->yandexXlsxFile = UploadedFile::getInstanceByName('yandexXlsxFile');
+            $model->avitoXlsxFile = UploadedFile::getInstanceByName('avitoXlsxFile');
+            $model->cianXlsxFile = UploadedFile::getInstanceByName('cianXlsxFile');
+            if ($model->convertXlsxToXml()) {
+                return [
+                    'xmlFiles' => $model->xmlFiles,
+                    'processErrors' => $model->errors,
+                ];
+            }
+            return ['errors' => $model->errors];
+        }
+        throw new BadRequestHttpException('Неверный запрос');
+    }
+
+    /**
+     * @return array
+     * @throws BadRequestHttpException
+     */
+    public function actionRemoveXml()
+    {
+        $model = new XmlParser();
+        $req = Yii::$app->request;
+        if ($req->isPost and $model->load($req->post(), '')) {
+            if ($model->removeXml()) {
+                return ['status' => true];
+            }
+            return ['errors' => $model->errors];
+        }
+        throw new BadRequestHttpException('Неверный запрос');
     }
 
 }

@@ -1,248 +1,432 @@
 
-Vue.prototype.$delay = (ms, cb) ->
+delay = (ms, cb) ->
     setTimeout cb, ms
-    on
 
-Vue.prototype.$axios = axios.create
-    baseURL: '/fid-parser/api/'
-    responseType: 'json'
+class Loader
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+    axios: {}
 
-Vue.component 'app-loader',
-    template: '
-        <div
-            class="loader"
-            :class="{ active: isLoading }"
-        >
-            <img
-                class="loader-img"
-                height="8"
-                src="/img/loader.svg"
-                v-show="!isError"
-            >
-            <p
-                class="loader-error"
-                v-show="isError"
-            >
-                <i class="fas fa-exclamation-triangle"></i>
-                <span v-html="msg"></span>
-            </p>
-        </div>
-    '
+    _i: 0
 
-    data: ->
-        isLoading: off
-        isError: off
-        msg: '&nbsp;'
-        callBack: (data) ->
+    _callBackSuccess: (data) ->
+    _callBackError: (message) ->
+    _callBackAllways: () ->
 
-    methods:
-        post: (url, data, cb) ->
-            return off if @isLoading
-            @isLoading = on
-            @callBack = cb
-            @$axios
-                method: 'post'
-                url: url
-                data: data
-            .then (response) =>
-                @isLoading = off
-                @$delay 160, () =>
-                    @isError = off
-                    @msg = '&nbsp;'
-                @callBack response.data
-            .catch (error) =>
-                @msg = error.response
-                @isError = on
-                @$delay 3000, () =>
-                    @isLoading = off
-                @$delay 3160, () =>
-                    @isError = off
-                    @msg = '&nbsp;'
-            .then () =>
+    _callBackPartSuccess: (data) ->
+    _callBackPartError: (message) ->
+    _callBackPartAllways: () ->
+    _callBackPartAllDone: () ->
+
+    constructor: () ->
+        @axios = axios.create
+            baseURL: '/fid-parser/api/'
+            responseType: 'json'
+
+    post: (action, data) =>
+        @axios
+            method: 'post'
+            url: action
+            data: data
+        .then (response) =>
+            @_callBackSuccess response.data
             on
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-Vue.component 'app-button',
-    template: '
-        <div class="col-12 col-sm">
-            <button
-                class="btn btn-default"
-                @click.prevent="click"
-            >{{ button.label }}</button>
-        </div><!-- /.col -->
-    '
-
-    props:
-        button:
-            type: Object
-            required: on
-
-    methods:
-        click: (e) ->
-            this.$emit 'click', this.button
+        .catch (error) =>
+            msg = 'Внутренняя ошибка системы';
+            if error.response?.data?.message? and error.response.data.message isnt ''
+                msg = error.response.data.message
+            @_callBackError msg
             on
+        .then () =>
+            @_callBackAllways()
+            on
+        @
+
+    postEach: (action, dataArr, i=0) =>
+        isAllDone = dataArr.length is (i + 1)
+        isAllDone = on unless dataArr.length
+        @axios
+            method: 'post'
+            url: action
+            data: dataArr[i]
+        .then (response) =>
+            @_callBackPartSuccess response.data, i
+            @_callBackSuccess null if isAllDone
+            on
+        .catch (error) =>
+            msg = 'Внутренняя ошибка системы';
+            if error.response?.data?.message? and error.response.data.message isnt ''
+                msg = error.response.data.message
+            @_callBackPartError msg, i
+            on
+        .then () =>
+            @_callBackPartAllways()
+            if isAllDone
+                @_callBackPartAllDone()
+            else
+                @postEach action, dataArr, (i + 1)
+            on
+        @
+
+    success: (callBack) =>
+        @_callBackSuccess = callBack
+        @
+
+    error: (callBack) =>
+        @_callBackError = callBack
+        @
+
+    allways: (callBack) =>
+        @_callBackAllways = callBack
+        @
+
+    partSuccess: (callBack) =>
+        @_callBackPartSuccess = callBack
+        @
+
+    partError: (callBack) =>
+        @_callBackPartError = callBack
+        @
+
+    partAllways: (callBack) =>
+        @_callBackPartAllways = callBack
+        @
+
+    partAllDone: (callBack) =>
+        @_callBackPartAllDone = callBack
+        @
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-Vue.component 'app-btn-group',
+Vue.config.productionTip = off
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+Vue.component 'app-xml-xlsx',
     template: '
         <div>
-            <span class="label">Добавить ссылку на фид:</span>
-            <div class="btn-group">
-                <app-button
-                    v-for="(button, i) in buttons"
-                    :key="i"
-                    :button="button"
-                    @click="click"
-                />
-            </div><!-- /.btn-group -->
-        </div>
-    '
-
-    props:
-        buttons:
-            type: Array
-            required: on
-
-    methods:
-        click: (button) ->
-            this.$emit 'click', button
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-Vue.component 'app-input',
-    #1 value="http://crm.loc/tmp/yandex.xml"
-    template: '
-        <div
-            class="animated faster"
-            :class="animClass"
-        >
-            <label class="label">{{ input.label }}</label>
-            <div class="input-group">
-                <input
-                    type="text"
-                    class="input"
-                    :class="{error: input.error}"
-                    :name="input.name"
-                    @focus="input.error = false"
-                >
-                <a
-                    href="#"
-                    class="input-group-right ln-red"
-                    @click.prevent="remove"
-                >
-                    <i class="fas fa-times"></i>
-                </a>
-            </div><!-- /.input-group -->
-            <span v-if="input.error" class="input-error">{{ input.error }}</span>
-        </div>
-    '
-
-    props:
-        input:
-            type: Object
-            required: on
-
-    data: ->
-        error: off
-        errorMsg: ''
-        animClass: 'fadeInDown'
-
-    methods:
-        remove: (e) ->
-            @$emit 'remove', @
-            on
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-Vue.component 'app-input-list',
-    template: '
-        <div class="d-flex flex-column-reverse">
-            <app-input
-                v-for="(input, i) in inputs"
-                :key="input.id"
-                :input="input"
-                @remove="removeInput($event, i)"
-            />
-        </div><!-- /.d-flex -->
-    '
-
-    props:
-        inputs:
-            type: Array
-            required: on
-
-    methods:
-        removeInput: (input, i) ->
-            @$emit 'remove', input, i
-            on
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-Vue.component 'app-form',
-    template: '
-        <div class="wall relative">
-            <app-btn-group :buttons="buttons" @click="addInput"/>
-            <form @submit.prevent="send">
-                <app-input-list
-                    :inputs="inputs"
-                    @remove="removeInput"
-                />
-                <div
-                    class="row animated faster"
-                    :class="submitAnimClass"
-                    v-show="showSubmit"
-                >
+            <div class="wall relative">
+                <span class="label">Добавить ссылку на фид (xml):</span>
+                <div class="btn-group">
+                    <div class="col-12 col-sm" v-for="(button, i) in buttons" :key="i">
+                        <button class="btn btn-default" @click.prevent="addInput(button)">
+                            {{ button.label }}
+                        </button>
+                    </div><!-- /.col -->
+                </div><!-- /.btn-group -->
+                <div class="d-flex flex-column-reverse">
+                    <div v-for="(input, i) in inputs">
+                        <label class="label">{{ input.label }}</label>
+                        <div class="input-group">
+                            <input
+                                type="text"
+                                class="input"
+                                autocomplete="off"
+                                v-model.trim="input.val"
+                                :class="{error: input.error}"
+                                @focus="input.error = false"
+                            >
+                            <a class="input-group-right ln-red" href="#" @click.prevent="removeInput(i)">
+                                <i class="fas fa-times"></i>
+                            </a>
+                        </div><!-- /.input-group -->
+                        <span v-if="input.error" class="input-error">{{ input.error }}</span>
+                    </div><!-- v-for inputs -->
+                </div><!-- /.d-flex -->
+                <div class="row" v-if="showSubmit">
                     <div class="col-auto ml-auto">
-                        <button class="btn btn-green" type="submit">Парсинг</button>
+                        <a class="btn btn-green" href @click.prevent="send">Парсинг</a>
                     </div>
                 </div><!-- /.row -->
-            </form>
-            <app-loader ref="loader"/>
-        </div><!-- /.wall -->
+            </div><!-- /.wall -->
+            <p v-show="files.length" class="text">Excel - спарсенные данные</p>
+            <div class="row-view" v-for="(file, i) in files">
+                <div class="row-view-content">
+                    <p class="text">{{ file.name }}</p>
+                </div><!-- /.row-view-content -->
+                <div class="action">
+                    <a class="action-btn delete" href="#" @click.prevent="removeFile(file, i)">
+                        <i class="fas fa-trash-alt"></i>
+                    </a>
+                    <a class="action-btn view" target="_blank" download :href="file.url">
+                        <i class="fas fa-download"></i>
+                    </a>
+                </div><!-- /.action -->
+                <div class="loader" :class="{ active: file.loader.active }">
+                    <img class="loader-img" height="6" src="/img/loader.svg" v-if="!file.loader.error">
+                    <p class="loader-error" v-if="file.loader.error">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span v-html="file.loader.error"></span>
+                    </p>
+                </div>
+            </div><!-- /.row-view -->
+            <div class="loader fixed" :class="{ active: loader.active }">
+                <img class="loader-img" height="6" src="/img/loader.svg">
+                <p class="loader-info" v-if="loader.info">
+                    <span v-html="loader.info"></span>
+                </p>
+                <p class="loader-error" v-if="loader.error">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span v-html="loader.error"></span>
+                </p>
+            </div>
+        </div><!-- /.root -->
     '
 
+    created: ->
+        @addXlsxFiles()
+        on
+
     data: ->
+        files: []
         inputs: []
-        inputId: 0
-        submitAnimClass: ''
         showSubmit: off
+        loader:
+            active: off
+            info: ''
+            error: ''
 
     methods:
-        addInput: (input) ->
-            this.inputId = 0 if @inputs.length is 0
-            id = ++@inputId
+        addInput: (button) ->
             @inputs.push
-                label: input.label
-                name: "#{input.name}[#{id}]"
-                id: id
-                error: ''
-            @toggleSubmit on if @inputs.length is 1
+                label: button.label
+                name: button.name
+                error: off
+                val: ''
+            @showSubmit = on if @inputs.length is 1
             on
-        removeInput: (input, i) ->
-            @toggleSubmit off if @inputs.length is 1
-            input.animClass = 'fadeOutUp'
-            @$delay 500, () => @inputs.splice i, 1
-            on
-        toggleSubmit: (show) ->
-            if show
-                @submitAnimClass = 'fadeInUp'
-                @showSubmit = on
-            else
-                @submitAnimClass = 'fadeOutDown'
-                @$delay 500, () => @showSubmit = off
+        removeInput: (i) ->
+            @showSubmit = off if @inputs.length is 1
+            @inputs.splice i, 1
             on
         send: (e) ->
-            formData = new FormData e.target
-            @$refs.loader.post 'parse.json', formData, (data) =>
-                if data?.errors?
-                    for id, msgArr of data.errors
-                        input.error = msgArr[0] for input in @inputs when Number(id) is input.id
+            @loader.active = on
+            dataArr = for input in @inputs
+                "#{input.name}XmlUrl": input.val
+            loader = new Loader
+            loader.postEach 'parse-xml.json', dataArr
+            .partSuccess (data, i) =>
+                if data?.errors?.processErrors?
+                    @inputs[i].error = data.errors.processErrors[0]
                 else if data?.xlsxFiles?
-                    @$emit 'complete', data.xlsxFiles
+                    @addXlsxFiles data.xlsxFiles
+                @loader.info = "Обработано #{i+1} из #{@inputs.length}"
+                on
+            .partError (msg, i) =>
+                @inputs[i].error = msg
+                on
+            .partAllDone () =>
+                @loader.active = off
+                @loader.info = ''
+                @loader.error = ''
+                @inputs = @inputs.filter (input) -> if input.error then on else off
+                @showSubmit = off if @inputs.length is 0
+                on
+            on
+        removeFile: (file, i) ->
+            file.loader.active = on
+            loader = new Loader
+            loader.post 'remove-xlsx.json', 'xlsxFileName': file.name
+            .success (data) =>
+                if data?.errors?.xlsxFileName?
+                    file.loader.error = data.errors.xlsxFileName[0]
+                    delay 3000, =>
+                        file.loader.active = off
+                        file.loader.error = ''
+                    on
+                else if data?.status? and data.status is on
+                    @files.splice i, 1
+                    @addXlsxFiles @files
+                    on
+                on
+            .error (msg) =>
+                file.loader.error = msg
+                delay 3000, =>
+                    file.loader.active = off
+                    file.loader.error = ''
+                on
+            on
+        addXlsxFiles: (newXlsxFiles=off) ->
+            window.xlsxFiles = newXlsxFiles if newXlsxFiles
+            if window.xlsxFiles? and window.xlsxFiles.length
+                @files = for file in window.xlsxFiles
+                    file.loader =
+                        active: off
+                        error: ''
+                    file
+                return on
+            @files = []
+            on
+
+
+
+    computed:
+        buttons: ->
+            [
+                { label: 'Yandex', name: 'yandex' }
+                { label: 'Avito', name: 'avito' }
+                { label: 'Cian', name: 'cian' }
+            ]
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+Vue.component 'app-xlsx-xml',
+    template: '
+        <div>
+            <div class="wall relative">
+                <span class="label">Добавить файл Excel (xlsx):</span>
+                <div class="btn-group">
+                    <div class="col-12 col-sm" v-for="(button, i) in buttons" :key="i">
+                        <button class="btn btn-default" @click.prevent="addInput(button)">
+                            {{ button.label }}
+                        </button>
+                    </div><!-- /.col -->
+                </div><!-- /.btn-group -->
+                <div v-for="(input, i) in inputs">
+                    <label class="label">{{ input.label }}</label>
+                    <div class="input-group">
+                        <div class="input" :class="{error: input.error}">
+                            {{ input.fileName }}
+                        </div>
+                        <a class="input-group-right ln-red" href="#" @click.prevent="removeInput(i)">
+                            <i class="fas fa-times"></i>
+                        </a>
+                    </div><!-- /.input-group -->
+                    <span v-if="input.error" class="input-error">{{ input.error }}</span>
+                </div>
+                <div class="row" v-if="showSubmit">
+                    <div class="col-auto ml-auto">
+                        <a class="btn btn-green" href @click.prevent="send">Конвертировать</a>
+                    </div>
+                </div><!-- /.row -->
+            </div><!-- /.wall -->
+            <p v-show="files.length" class="text">XML - конвертированные файлы</p>
+            <div class="row-view" v-for="(file, i) in files">
+                <div class="row-view-content">
+                    <p class="text">{{ file.name }}</p>
+                </div><!-- /.row-view-content -->
+                <div class="action">
+                    <a class="action-btn delete" href="#" @click.prevent="removeFile(file, i)">
+                        <i class="fas fa-trash-alt"></i>
+                    </a>
+                    <a class="action-btn update" target="_blank" download :href="file.url">
+                        <i class="fas fa-download"></i>
+                    </a>
+                    <a class="action-btn view" target="_blank" :href="file.url">
+                        <i class="fas fa-link"></i>
+                    </a>
+                </div><!-- /.action -->
+                <div class="loader" :class="{ active: file.loader.active }">
+                    <img class="loader-img" height="6" src="/img/loader.svg" v-if="!file.loader.error">
+                    <p class="loader-error" v-if="file.loader.error">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span v-html="file.loader.error"></span>
+                    </p>
+                </div>
+            </div><!-- /.row-view -->
+            <div class="loader fixed" :class="{ active: loader.active }">
+                <img class="loader-img" height="6" src="/img/loader.svg">
+                <p class="loader-info" v-if="loader.info"><span v-html="loader.info"></span></p>
+                <p class="loader-error" v-if="loader.error">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span v-html="loader.error"></span>
+                </p>
+            </div>
+        </div><!-- /.root -->
+    '
+
+    created: ->
+        @addXmlFiles()
+        on
+
+    data: ->
+        files: []
+        inputs: []
+        showSubmit: off
+        loader:
+            active: off
+            info: ''
+            error: ''
+
+    methods:
+        addInput: (button) ->
+            input = document.createElement 'input'
+            input.type = 'file'
+            input.accept = '.xlsx'
+            input.onchange = (e) =>
+                file = input.files[0]
+                @inputs.push
+                    label: button.label
+                    fileName: file.name
+                    error: ''
+                    name: button.name
+                    file: file
+                @showSubmit = on if @inputs.length is 1
+                on
+            input.click()
+            on
+        removeInput: (i) ->
+            @showSubmit = off if @inputs.length is 1
+            @inputs.splice i, 1
+            on
+        addXmlFiles: (newXmlFiles=off) ->
+            window.xmlFiles = newXmlFiles if newXmlFiles
+            if window.xmlFiles? and window.xmlFiles.length
+                @files = for file in window.xmlFiles
+                    file.loader =
+                        active: off
+                        error: ''
+                    file
+                return on
+            @files = []
+            on
+        send: (e) ->
+            @loader.active = on
+            dataArr = for input in @inputs
+                formData = new FormData
+                formData.set "#{input.name}XlsxFile", input.file
+                formData
+            loader = new Loader
+            loader.postEach 'parse-xlsx.json', dataArr
+            .partSuccess (data, i) =>
+                if data?.errors?.processErrors?
+                    @inputs[i].error = data.errors.processErrors[0]
+                else if data?.xmlFiles?
+                    @addXmlFiles data.xmlFiles
+                @loader.info = "Обработано #{i+1} из #{@inputs.length}"
+                on
+            .partError (msg, i) =>
+                @inputs[i].error = msg
+                on
+            .partAllDone () =>
+                @loader.active = off
+                @loader.info = ''
+                @loader.error = ''
+                @inputs = @inputs.filter (input) -> if input.error then on else off
+                @showSubmit = off if @inputs.length is 0
+                on
+            on
+        removeFile: (file, i) ->
+            file.loader.active = on
+            loader = new Loader
+            loader.post 'remove-xml.json', 'xmlFileName': file.name
+            .success (data) =>
+                if data?.errors?.xmlFileName?
+                    file.loader.error = data.errors.xmlFileName[0]
+                    delay 3000, =>
+                        file.loader.active = off
+                        file.loader.error = ''
+                    on
+                else if data?.status? and data.status is on
+                    @files.splice i, 1
+                    @addXmlFiles @files
+                    on
+                on
+            .error (msg) =>
+                file.loader.error = msg
+                delay 3000, =>
+                    file.loader.active = off
+                    file.loader.error = ''
+                on
             on
 
     computed:
@@ -255,114 +439,44 @@ Vue.component 'app-form',
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-Vue.component 'app-row',
-    template: '
-        <div
-            class="row-view animated faster"
-            :class="animClass"
-        >
-            <div class="row-view-content">
-                <p class="text">{{ file.name }}</p>
-                <p class="text red">{{ error }}</p>
-            </div><!-- /.row-view-content -->
-            <div class="action">
-                <a
-                    class="action-btn delete"
-                    href="#"
-                    @click.prevent="remove"
-                >
-                    <i class="fas fa-trash-alt"></i>
-                </a>
-                <a
-                    class="action-btn view"
-                    target="_blank"
-                    download
-                    :href="file.url"
-                >
-                    <i class="fas fa-download"></i>
-                </a>
-            </div><!-- /.action -->
-            <app-loader ref="loader"/>
-        </div><!-- /.row-view -->
-    '
-
-    props:
-        file: Object # {name, url}
-        required: on
-
-    data: ->
-        animClass: ''
-        error: ''
-
-    methods:
-        remove: (e) ->
-            formData = new FormData
-            formData.set 'xlsxFileName', @file.name
-            @$refs.loader.post 'remove-xlsx.json', formData, (data) =>
-                if data?.errors?.xlsxFileName?
-                    @error = data.errors.xlsxFileName[0]
-                    @$delay 3000, => @error = ''
-                else if data?.status? and data.status is true
-                    @animClass = 'zoomOut'
-                    @$delay 500, => @$emit 'remove'
-                on
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-Vue.component 'app-row-list',
-    template: '
-        <div class="relative">
-            <p v-show="files.length" class="text">Excel - спарсенные данные</p>
-            <app-row
-                v-for="(file, i) in files"
-                :file="file"
-                :key="file.id"
-                @remove="removeFile(i)"
-            />
-            <app-loader ref="loader"/>
-        </div>
-    '
-
-    props:
-        files:
-            type: Array
-            required: on
-
-
-    methods:
-        removeFile: (i) ->
-            @$emit 'remove', i
-            on
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
 App =
     template: '
         <div class="container">
-            <app-form
-                @complete="updateXlsx"
-            />
-            <app-row-list
-                :files="xlsxFiles"
-                @remove="removeFile"
-            />
+            <div class="tab">
+                <a
+                    class="tab-ln"
+                    href="#"
+                    v-for="tab in tabs"
+                    :class="{ active: tab.active }"
+                    @click.prevent="showComponent(tab.name)"
+                    ><span v-html="tab.label"></span></a>
+            </div>
+            <component :is="currentComponent"></component>
         </div><!-- /.container -->
     '
 
     data: ->
-        xlsxFiles: xlsxFiles ? []
+        tabs: [
+            {
+                name: 'app-xml-xlsx'
+                label: 'XML <i class="fas fa-chevron-right"></i> XLSX'
+                active: off
+            }
+            {
+                name: 'app-xlsx-xml'
+                label: 'XLSX <i class="fas fa-chevron-right"></i> XML'
+                active: on
+            }
+        ]
+        currentComponent: 'app-xlsx-xml'
 
     methods:
-        updateXlsx: (xlsxFiles) ->
-            @xlsxFiles = xlsxFiles
-            on
-        removeFile: (i) ->
-            @xlsxFiles.splice i, 1
-            on
+        showComponent: (name) ->
+            tab.active = name is tab.name for tab in @tabs
+            @currentComponent = name
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 new Vue
-    render: (h) ->
-        h App
+    render: (h) -> h App
 .$mount '#app-fid-parser-index'

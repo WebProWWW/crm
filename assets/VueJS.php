@@ -13,5 +13,5 @@ use yii\web\AssetBundle;
 class VueJS extends AssetBundle
 {
     public $sourcePath = '@vendor/vuejs/vue/dist';
-    public $js = ['vue.js'];
+    public $js = ['vue.min.js'];
 }

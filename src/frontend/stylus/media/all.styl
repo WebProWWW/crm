@@ -41,7 +41,7 @@ i
     right 0
     background #394164
     box-shadow 0 0 8px 0 alpha(black, 50%)
-    z-index 10
+    z-index 1000
     &-ln
         mpd(0, 6px 0, flex)
         resetLn(#9099B7, white)
@@ -172,16 +172,16 @@ i
 
 
 .tab
-    mpd(20px 0 0, 0, flex)
+    mpd(0 0 1rem, 0, flex)
     flex-wrap wrap
-    border-bottom 1px solid #384162
+    border-bottom 1px solid #394164
     &-ln
         mpd(0, 0.8rem 1rem)
-        resetLn(#8F99B5, lighten(#8F99B5, 30%))
-        background #1E253C
+        resetLn(#9099B7, white)
+        background transparent
         &.active
-            background #384162
-            color lighten(#8F99B5, 30%)
+            resetLn(white, white)
+            background #394164
     &-content
         &-item
             display none
@@ -263,7 +263,7 @@ i
         -webkit-text-fill-color white
         &:focus
             b(1, #33A8AB)
-    &:focus
+    &:focus, &.success
         b(1, #33A8AB)
     &-error
         mpd(-0.9rem 0 1rem, 0 0 0 1rem)
@@ -479,24 +479,32 @@ textarea.input
 .loader
     mpd(0, 0, flex)
     trans()
+    flex-direction column
     justify-content center
-    align-items center
     position absolute
     top 0
     left 0
     right 0
     bottom 0
-    background alpha(#1F253D, 60%)
-    z-index 20
+    background alpha(#1F253D, 80%)
+    font-size 0.9em
+    z-index 1100
     visibility hidden
     opacity 0
+    &.fixed
+        position fixed
     &.active
         visibility visible
         opacity 1
     &-img
         mpd()
+    &-info
+        mpd(0.5rem 0 0)
+        text-align center
+        font-size 0.93em
     &-error
         mpd()
+        text-align center
         color #E64C65
 
 
@@ -518,3 +526,5 @@ textarea.input
 
 .ln-white
     resetLn(white, #9099B7)
+
+

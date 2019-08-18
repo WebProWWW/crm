@@ -22,7 +22,7 @@ use yii\web\AssetBundle;
  */
 class Asset extends AssetBundle
 {
-    public $css = ['css/main.css'];
+    public $css = ['css/main.css?v=001'];
     public $js = ['js/main.js'];
     public $depends = [
         BootstrapReboot::class,

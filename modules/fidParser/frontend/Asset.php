@@ -15,7 +15,7 @@ use yii\web\AssetBundle;
 
 class Asset extends AssetBundle
 {
-    public $js = ['js/feed-parser.js?v=001'];
+    public $js = ['js/feed-parser.js?v=002'];
     public $depends = [
         AnimateCSS::class,
         Axios::class,
